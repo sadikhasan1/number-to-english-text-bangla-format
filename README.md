@@ -10,6 +10,7 @@ This Java utility provides a flexible and efficient solution for converting nume
 - Support for traditional and legacy Bengali numeric formats.
 - Flexibility to choose between English and Bangla language outputs.
 - Modular design for easy integration into other projects.
+- Supports pretty much any number. Sky is the limit.
 
 ## Usage
 
