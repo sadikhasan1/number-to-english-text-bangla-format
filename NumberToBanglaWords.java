@@ -10,6 +10,7 @@ public class NumberToBanglaWords {
 
     private static final String[] ENGLISH_NUMBER_UNITS = { "", "Thousand", "Lakh", "Crore", "Arab", "Kharab", "Neel",
             "Padma", "Shankh", "Padra", "Kharab", "Shankh", "Kuti", "Kharab", "Shankh", "Mahashankh" };
+        private static final String[] ENGLISH_LEGACY_NUMBER_UNITS = { "", "Thousand", "Ojut", "Laksh", "Niyut", "Koti", "Arbyud", "Padma", "Kharba", "Nikharba", "MahaPadma", "Shanku", "Jaladhi", "Antyo", "Moddho", "Parardha" };
 
     private static final String[] BENGALI_ZERO_TO_HUNDRED = { "শূন্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত",
             "আট", "নয়", "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোল", "সতেরো", "আঠারো", "ঊনিশ", "বিশ",
@@ -22,11 +23,10 @@ public class NumberToBanglaWords {
             "সাতাত্তর", "আটাত্তর", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই",
             "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই" };
 
-    private static final String[] BENGALI_NUMBER_UNITS = { "", "হাজার", "লক্ষ", "কোটি", "অবলম্ব", "পদ্ম", "নিয়োগ",
-            "কয়লা", "পড়া", "কোটি", "অবকড়া", "শঙ্খ", "খরব", "অবখরব", "নিকুল", "পদ্মিনী", "শঙ্খ", "মহাশঙ্খ" };
-
+    private static final String[] BENGALI_NUMBER_UNITS = { "", "হাজার", "লক্ষ", "কোটি", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
+    private static final String[] BENGALI_LEGACY_NUMBER_UNITS = { "", "হাজার", "অযুত", "লক্ষ", "নিযুত", "কোটি", "অর্বুদ", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
     private static String convertLessThanThousandToWords(int num, String[] units) {
-        if (units == BENGALI_NUMBER_UNITS) {
+        if (units == BENGALI_NUMBER_UNITS || units == BENGALI_LEGACY_NUMBER_UNITS) {
             return convertLessThanThousandToBangla(num);
         } else {
             return convertLessThanThousand(num);
@@ -58,7 +58,7 @@ public class NumberToBanglaWords {
     }
 
     public static void main(String[] args) {
-        String inputString = "111111111122222222223333333333444444444444445555555555566666666666677777777778888888889999999999";
+        String inputString = "1111111111222222222233333333334444444444444455555555555666666666666777777777788888888899999999991111111111";
 
         String hundredCroreWord = hundredCroreLoop(inputString);
         System.out.println(hundredCroreWord);
@@ -81,7 +81,7 @@ public class NumberToBanglaWords {
         String words = "";
         int currentIndex = inputString.length();
         boolean isUnitEnabled = false;
-
+        boolean shouldBreak = false;
         while (currentIndex > 0) {
             int index = 0;
             for (int i = pattern.length - 1; i >= 0; i--) {
@@ -100,8 +100,12 @@ public class NumberToBanglaWords {
                     currentIndex -= length;
                     index++;
                 } else {
+                    shouldBreak = true;
                     break;
                 }
+            }
+            if (shouldBreak) {
+                break;
             }
             isUnitEnabled = true;
         }
@@ -114,8 +118,8 @@ public class NumberToBanglaWords {
     }
 
     private static String mahaSankhLoop(String inputString) {
-        int[] pattern = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
-        return convertNumberToWords(pattern, ENGLISH_NUMBER_UNITS, inputString);
+        int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
+        return convertNumberToWords(pattern, ENGLISH_LEGACY_NUMBER_UNITS, inputString);
     }
 
     private static String hundredCroreLoopBangla(String inputString) {
@@ -124,8 +128,8 @@ public class NumberToBanglaWords {
     }
 
     private static String mahaSankhLoopBangla(String inputString) {
-        int[] pattern = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
-        return convertNumberToWords(pattern, BENGALI_NUMBER_UNITS, inputString);
+        int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
+        return convertNumberToWords(pattern, BENGALI_LEGACY_NUMBER_UNITS, inputString);
     }
 
 }
