@@ -3,7 +3,7 @@ public class NumberToBanglaWords {
         BANGLA, BANGLA_LEGACY, ENGLISH, ENGLISH_LEGACY
     }
 
-    private static final String[] BANGLA_ONES = { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+    private static final String[] ONES = { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
             "Nine" };
 
     private static final String[] TEENS = { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
@@ -75,13 +75,13 @@ public class NumberToBanglaWords {
         if (num == 0) {
             return "";
         } else if (num < 10) {
-            return BANGLA_ONES[num] + " ";
+            return ONES[num] + " ";
         } else if (num < 20) {
             return TEENS[num - 10] + " ";
         } else if (num < 100) {
-            return TENS[num / 10] + " " + BANGLA_ONES[num % 10] + " ";
+            return TENS[num / 10] + " " + ONES[num % 10] + " ";
         } else {
-            return BANGLA_ONES[num / 100] + " Hundred " + convertLessThanThousand(num % 100);
+            return ONES[num / 100] + " Hundred " + convertLessThanThousand(num % 100);
         }
     }
 
