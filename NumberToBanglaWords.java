@@ -35,7 +35,6 @@ public class NumberToBanglaWords {
             "অর্বুদ", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
 
     public static void main(String[] args) {
-        System.out.println(numberToBanglaText(123134213));
     }
 
     public static String numberToBanglaText(Object numericValue, FORMAT format) {
