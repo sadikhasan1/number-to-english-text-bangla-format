@@ -42,11 +42,23 @@ Converts a numeric value into its word representation in traditional Bengali for
 ## Examples
 
 ```java
-String input = "123456789";
-String englishWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.ENGLISH);
+int input = "123456789";
+
+String englishWords = NumberToBanglaWords.numberToBanglaText(input);
 System.out.println("English: " + englishWords);
 
 String bengaliWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.BANGLA);
+System.out.println("Bengali: " + bengaliWords);
+```
+
+## Let's get crazy. This code can handle pretty much any number. Let's try it out!
+
+```java
+String input = "123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321";
+String englishWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.ENGLISH);
+System.out.println("English: " + englishWords);
+
+String bengaliWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.BANGLA_LEGACY);
 System.out.println("Bengali: " + bengaliWords);
 ```
 
