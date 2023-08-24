@@ -1,5 +1,4 @@
 public class NumberToBanglaWords {
-
     private static final String[] BANGLA_ONES = { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
             "Nine" };
 
@@ -9,8 +8,8 @@ public class NumberToBanglaWords {
     private static final String[] TENS = { "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty",
             "Ninety" };
 
-    private static final String[] THOUSANDS = { "", "Thousand", "Lakh", "Crore", "Arab", "Kharab", "Neel", "Padma",
-            "Shankh", "Maha Shankh" };
+    private static final String[] ENGLISH_NUMBER_UNITS = { "", "Thousand", "Lakh", "Crore", "Arab", "Kharab", "Neel",
+            "Padma", "Shankh", "Padra", "Kharab", "Shankh", "Kuti", "Kharab", "Shankh", "Mahashankh" };
 
     private static final String[] BENGALI_ZERO_TO_HUNDRED = { "শূন্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত",
             "আট", "নয়", "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোল", "সতেরো", "আঠারো", "ঊনিশ", "বিশ",
@@ -21,10 +20,18 @@ public class NumberToBanglaWords {
             "আটান্ন", "ঊনষাট", "ষাট", "একষট্টি", "বাষট্টি", "তেষট্টি", "চৌষট্টি", "পঁয়ষট্টি", "ছেষট্টি", "সাতষট্টি",
             "আটষট্টি", "ঊনসত্তর", "সত্তর", "একাত্তর", "বাহাত্তর", "তিয়াত্তর", "চুয়াত্তর", "পঁচাত্তর", "ছিয়াত্তর",
             "সাতাত্তর", "আটাত্তর", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই",
-            "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "ঊননব্বই" };
+            "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই" };
 
     private static final String[] BENGALI_NUMBER_UNITS = { "", "হাজার", "লক্ষ", "কোটি", "অবলম্ব", "পদ্ম", "নিয়োগ",
             "কয়লা", "পড়া", "কোটি", "অবকড়া", "শঙ্খ", "খরব", "অবখরব", "নিকুল", "পদ্মিনী", "শঙ্খ", "মহাশঙ্খ" };
+
+    private static String convertLessThanThousandToWords(int num, String[] units) {
+        if (units == BENGALI_NUMBER_UNITS) {
+            return convertLessThanThousandToBangla(num);
+        } else {
+            return convertLessThanThousand(num);
+        }
+    }
 
     private static String convertLessThanThousandToBangla(int num) {
         if (num == 0) {
@@ -51,7 +58,7 @@ public class NumberToBanglaWords {
     }
 
     public static void main(String[] args) {
-        String inputString = "111111111122222222233333";
+        String inputString = "111111111122222222223333333333444444444444445555555555566666666666677777777778888888889999999999";
 
         String hundredCroreWord = hundredCroreLoop(inputString);
         System.out.println(hundredCroreWord);
@@ -70,11 +77,11 @@ public class NumberToBanglaWords {
         return String.valueOf(numericValue);
     }
 
-    private static String hundredCroreLoop(String inputString) {
+    private static String convertNumberToWords(int[] pattern, String[] units, String inputString) {
         String words = "";
-        int[] pattern = { 2, 2, 3 };
         int currentIndex = inputString.length();
-        boolean isCroreEnabled = false;
+        boolean isUnitEnabled = false;
+
         while (currentIndex > 0) {
             int index = 0;
             for (int i = pattern.length - 1; i >= 0; i--) {
@@ -82,120 +89,43 @@ public class NumberToBanglaWords {
                 if (currentIndex - length >= 0) {
                     String substring = inputString.substring(currentIndex - length, currentIndex);
                     int number = Integer.parseInt(substring);
-                    if (isCroreEnabled && i == pattern.length - 1) {
-                        words = convertLessThanThousand(number) + THOUSANDS[index] + THOUSANDS[3] + " " + words;
 
+                    if (isUnitEnabled && i == pattern.length - 1) {
+                        words = convertLessThanThousandToWords(number, units) + units[index] + units[pattern.length]
+                                + " " + words;
                     } else {
-                        words = convertLessThanThousand(number) + THOUSANDS[index] + " " + words;
+                        words = convertLessThanThousandToWords(number, units) + units[index] + " " + words;
                     }
+
                     currentIndex -= length;
                     index++;
-
                 } else {
                     break;
                 }
             }
-
-            isCroreEnabled = true;
-
+            isUnitEnabled = true;
         }
         return words;
+    }
+
+    private static String hundredCroreLoop(String inputString) {
+        int[] pattern = { 2, 2, 3 };
+        return convertNumberToWords(pattern, ENGLISH_NUMBER_UNITS, inputString);
     }
 
     private static String mahaSankhLoop(String inputString) {
-        String words = "";
-        int[] pattern = { 2, 2, 2, 2, 2, 2, 2, 2, 3 }; // Define the pattern
-
-        int currentIndex = inputString.length();
-
-        boolean isMahaSankhEnabled = false;
-        while (currentIndex > 0) {
-            int index = 0;
-            for (int i = pattern.length - 1; i >= 0; i--) {
-                int length = pattern[i];
-                if (currentIndex - length >= 0) {
-                    String substring = inputString.substring(currentIndex - length, currentIndex);
-                    int number = Integer.parseInt(substring);
-                    if (isMahaSankhEnabled && i == pattern.length - 1) {
-                        words = convertLessThanThousand(number) + THOUSANDS[index] + THOUSANDS[9] + " " + words;
-                    } else {
-                        words = convertLessThanThousand(number) + THOUSANDS[index] + " " + words;
-                    }
-                    currentIndex -= length;
-                    index++;
-                } else {
-                    break;
-                }
-            }
-
-            isMahaSankhEnabled = true;
-
-        }
-        return words;
+        int[] pattern = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
+        return convertNumberToWords(pattern, ENGLISH_NUMBER_UNITS, inputString);
     }
 
     private static String hundredCroreLoopBangla(String inputString) {
-        String words = "";
         int[] pattern = { 2, 2, 3 };
-
-        int currentIndex = inputString.length();
-
-        boolean isCroreEnabled = false;
-        while (currentIndex > 0) {
-            int index = 0;
-            for (int i = pattern.length - 1; i >= 0; i--) {
-                int length = pattern[i];
-                if (currentIndex - length >= 0) {
-                    String substring = inputString.substring(currentIndex - length, currentIndex);
-                    int number = Integer.parseInt(substring);
-                    if (isCroreEnabled && i == pattern.length - 1) {
-                        words = convertLessThanThousandToBangla(number) + BENGALI_NUMBER_UNITS[index]
-                                + BENGALI_NUMBER_UNITS[3] + " " + words;
-                    } else {
-                        words = convertLessThanThousandToBangla(number) + BENGALI_NUMBER_UNITS[index] + " " + words;
-                    }
-                    currentIndex -= length;
-                    index++;
-
-                } else {
-                    break;
-                }
-            }
-            isCroreEnabled = true;
-
-        }
-        return words;
+        return convertNumberToWords(pattern, BENGALI_NUMBER_UNITS, inputString);
     }
 
     private static String mahaSankhLoopBangla(String inputString) {
-        String words = "";
-        int[] pattern = { 2, 2, 2, 2, 2, 2, 2, 2, 3 }; // Define the pattern
-
-        int currentIndex = inputString.length();
-
-        boolean isMahaSankhEnabled = false;
-        while (currentIndex > 0) {
-            int index = 0;
-            for (int i = pattern.length - 1; i >= 0; i--) {
-                int length = pattern[i];
-                if (currentIndex - length >= 0) {
-                    String substring = inputString.substring(currentIndex - length, currentIndex);
-                    int number = Integer.parseInt(substring);
-
-                    if (isMahaSankhEnabled && i == pattern.length - 1) {
-                        words = convertLessThanThousandToBangla(number) + BENGALI_NUMBER_UNITS[index]
-                                + BENGALI_NUMBER_UNITS[17] + " " + words;
-                    } else {
-                        words = convertLessThanThousandToBangla(number) + BENGALI_NUMBER_UNITS[index] + " " + words;
-                    }
-                    currentIndex -= length;
-                    index++;
-                } else {
-                    break;
-                }
-            }
-            isMahaSankhEnabled = true;
-        }
-        return words;
+        int[] pattern = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3 };
+        return convertNumberToWords(pattern, BENGALI_NUMBER_UNITS, inputString);
     }
+
 }
