@@ -1,4 +1,8 @@
 public class NumberToBanglaWords {
+    private static enum FORMAT {
+        BANGLA, BANGLA_LEGACY, ENGLISH, ENGLISH_LEGACY
+    }
+
     private static final String[] BANGLA_ONES = { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
             "Nine" };
 
@@ -10,7 +14,8 @@ public class NumberToBanglaWords {
 
     private static final String[] ENGLISH_NUMBER_UNITS = { "", "Thousand", "Lakh", "Crore", "Arab", "Kharab", "Neel",
             "Padma", "Shankh", "Padra", "Kharab", "Shankh", "Kuti", "Kharab", "Shankh", "Mahashankh" };
-        private static final String[] ENGLISH_LEGACY_NUMBER_UNITS = { "", "Thousand", "Ojut", "Laksh", "Niyut", "Koti", "Arbyud", "Padma", "Kharba", "Nikharba", "MahaPadma", "Shanku", "Jaladhi", "Antyo", "Moddho", "Parardha" };
+    private static final String[] ENGLISH_LEGACY_NUMBER_UNITS = { "", "Thousand", "Ojut", "Laksh", "Niyut", "Koti",
+            "Arbyud", "Padma", "Kharba", "Nikharba", "MahaPadma", "Shanku", "Jaladhi", "Antyo", "Moddho", "Parardha" };
 
     private static final String[] BENGALI_ZERO_TO_HUNDRED = { "শূন্য", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত",
             "আট", "নয়", "দশ", "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোল", "সতেরো", "আঠারো", "ঊনিশ", "বিশ",
@@ -21,10 +26,34 @@ public class NumberToBanglaWords {
             "আটান্ন", "ঊনষাট", "ষাট", "একষট্টি", "বাষট্টি", "তেষট্টি", "চৌষট্টি", "পঁয়ষট্টি", "ছেষট্টি", "সাতষট্টি",
             "আটষট্টি", "ঊনসত্তর", "সত্তর", "একাত্তর", "বাহাত্তর", "তিয়াত্তর", "চুয়াত্তর", "পঁচাত্তর", "ছিয়াত্তর",
             "সাতাত্তর", "আটাত্তর", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই",
-            "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই", "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই" };
+            "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "ঊননব্বই", "নব্বই", "একানব্বই", "বিরানব্বই", "তিরানব্বই",
+            "চুরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই" };
 
-    private static final String[] BENGALI_NUMBER_UNITS = { "", "হাজার", "লক্ষ", "কোটি", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
-    private static final String[] BENGALI_LEGACY_NUMBER_UNITS = { "", "হাজার", "অযুত", "লক্ষ", "নিযুত", "কোটি", "অর্বুদ", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
+    private static final String[] BENGALI_NUMBER_UNITS = { "", "হাজার", "লক্ষ", "কোটি", "পদ্ম", "খর্ব", "নিখর্ব",
+            "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
+    private static final String[] BENGALI_LEGACY_NUMBER_UNITS = { "", "হাজার", "অযুত", "লক্ষ", "নিযুত", "কোটি",
+            "অর্বুদ", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
+
+    public static void main(String[] args) {
+        System.out.println(numberToBanglaText(123134213));
+    }
+
+    public static String numberToBanglaText(Object numericValue, FORMAT format) {
+        if (format.equals(FORMAT.BANGLA)) {
+            return traditionalBengaliFormat(String.valueOf(numericValue));
+        } else if (format.equals(FORMAT.BANGLA_LEGACY)) {
+            return legacyBengaliFormat(String.valueOf(numericValue));
+        } else if (format.equals(FORMAT.ENGLISH_LEGACY)) {
+            return legacyBengaliFormatInEnglish(String.valueOf(numericValue));
+        } else {
+            return traditionalBengaliFormatInEnglish(String.valueOf(numericValue));
+        }
+    }
+
+    public static String numberToBanglaText(Object numericValue) {
+        return traditionalBengaliFormatInEnglish(String.valueOf(numericValue));
+    }
+
     private static String convertLessThanThousandToWords(int num, String[] units) {
         if (units == BENGALI_NUMBER_UNITS || units == BENGALI_LEGACY_NUMBER_UNITS) {
             return convertLessThanThousandToBangla(num);
@@ -55,22 +84,6 @@ public class NumberToBanglaWords {
         } else {
             return BANGLA_ONES[num / 100] + " Hundred " + convertLessThanThousand(num % 100);
         }
-    }
-
-    public static void main(String[] args) {
-        String inputString = "1111111111222222222233333333334444444444444455555555555666666666666777777777788888888899999999991111111111";
-
-        String hundredCroreWord = hundredCroreLoop(inputString);
-        System.out.println(hundredCroreWord);
-
-        String mahaSankh = mahaSankhLoop(inputString);
-        System.out.println(mahaSankh);
-
-        String hundredCroreWordBangla = hundredCroreLoopBangla(inputString);
-        System.out.println(hundredCroreWordBangla);
-
-        String mahaSankhBangla = mahaSankhLoopBangla(inputString);
-        System.out.println(mahaSankhBangla);
     }
 
     public static String convertToString(Object numericValue) {
@@ -112,22 +125,22 @@ public class NumberToBanglaWords {
         return words;
     }
 
-    private static String hundredCroreLoop(String inputString) {
+    private static String traditionalBengaliFormatInEnglish(String inputString) {
         int[] pattern = { 2, 2, 3 };
         return convertNumberToWords(pattern, ENGLISH_NUMBER_UNITS, inputString);
     }
 
-    private static String mahaSankhLoop(String inputString) {
+    private static String legacyBengaliFormatInEnglish(String inputString) {
         int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
         return convertNumberToWords(pattern, ENGLISH_LEGACY_NUMBER_UNITS, inputString);
     }
 
-    private static String hundredCroreLoopBangla(String inputString) {
+    private static String traditionalBengaliFormat(String inputString) {
         int[] pattern = { 2, 2, 3 };
         return convertNumberToWords(pattern, BENGALI_NUMBER_UNITS, inputString);
     }
 
-    private static String mahaSankhLoopBangla(String inputString) {
+    private static String legacyBengaliFormat(String inputString) {
         int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
         return convertNumberToWords(pattern, BENGALI_LEGACY_NUMBER_UNITS, inputString);
     }
