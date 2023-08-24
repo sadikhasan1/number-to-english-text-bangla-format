@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 
 public class NumberToBanglaWords {
 
@@ -30,27 +28,6 @@ public class NumberToBanglaWords {
         } else {
             return BANGLA_ONES[num / 100] + " Hundred " + convertLessThanThousand(num % 100);
         }
-    }
-
-    public static int[] sliceIntoChunks(String inputString) {
-        List<Integer> chunks = new ArrayList<>();
-
-        while (inputString.length() > 0) {
-            int endIndex = Math.max(inputString.length() - 10, 0);
-            String chunk = inputString.substring(endIndex);
-            inputString = inputString.substring(0, endIndex);
-            chunks.add(Integer.parseInt(chunk));
-            System.out.println(chunk);
-        }
-
-        Collections.reverse(chunks);
-
-        int[] result = new int[chunks.size()];
-        for (int i = 0; i < chunks.size(); i++) {
-            result[i] = chunks.get(i);
-
-        }
-        return result;
     }
 
     public static void main(String[] args) {
