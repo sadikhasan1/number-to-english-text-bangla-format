@@ -57,10 +57,9 @@ The class supports the following number displays:
 ```java
 public class Main {
     public static void main(String[] args) {
-        double numericValue = 12345.67;
-
-        String bengaliDecimalText = NumberToBanglaWords.numberToBanglaText(numericValue, NumberToBanglaWords.FORMAT.BANGLA);
-
+        BigDecimal numericBigDecimal = new BigDecimal("-62.67345");
+        String bengaliDecimalText = NumberToBanglaWords.numberToBanglaText(numericBigDecimal,
+                NumberToBanglaWords.FORMAT.BANGLA);
         System.out.println("Bengali Decimal Text: " + bengaliDecimalText);
     }
 }
@@ -68,7 +67,7 @@ public class Main {
 
 Output:
 ```
-Bengali Decimal Text: বারো হাজার তিনশত পঁয়তাল্লিশ দশমিক সাতোষ্ঠি
+Bengali Decimal Text: ঋণাত্মক বাষট্টি দশমিক ছয় সাত তিন চার পাঁচ
 ```
 
 ### Example 2: Converting to English Currency Text
@@ -76,10 +75,9 @@ Bengali Decimal Text: বারো হাজার তিনশত পঁয়�
 ```java
 public class Main {
     public static void main(String[] args) {
-        double numericValue = 12345.67;
-
-        String englishCurrencyText = NumberToBanglaWords.numberToBanglaText(numericValue, NumberToBanglaWords.FORMAT.ENGLISH, NumberToBanglaWords.NUMBER_DISPLAY.CURRENCY);
-
+        String numericString = "12345.07675";
+        String englishCurrencyText = NumberToBanglaWords.numberToBanglaText(numericString,
+                NumberToBanglaWords.FORMAT.ENGLISH, NumberToBanglaWords.NUMBER_DISPLAY.CURRENCY);
         System.out.println("English Currency Text: " + englishCurrencyText);
     }
 }
@@ -87,7 +85,7 @@ public class Main {
 
 Output:
 ```
-English Currency Text: Twelve Thousand Three Hundred Forty-Five Taka Sixty-Seven Paisa
+English Currency Text: Twelve Thousand Three Hundred Forty Five Taka Eight Paisa
 ```
 
 ### Example 3: Converting with Default Format and Display
@@ -95,10 +93,8 @@ English Currency Text: Twelve Thousand Three Hundred Forty-Five Taka Sixty-Seven
 ```java
 public class Main {
     public static void main(String[] args) {
-        double numericValue = 98765.43;
-
-        String defaultText = NumberToBanglaWords.numberToBanglaText(numericValue);
-
+        double numericDouble = 0.43234;
+        String defaultText = NumberToBanglaWords.numberToBanglaText(numericDouble);
         System.out.println("Default Text: " + defaultText);
     }
 }
@@ -106,7 +102,23 @@ public class Main {
 
 Output:
 ```
-Default Text: নয়সয় হাজার সাতশত পঁয়ত্রিশ দশমিক চুরানব্বই
+Default Text: Zero Point Four Three Two Three Four
+```
+
+### Example 4: Buckle up! Let's get crazy. This code can handle pretty much any number. Let's try it out!
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        String input = "123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321";
+        String englishWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.ENGLISH);
+        System.out.println("English: " + englishWords);
+}
+```
+
+Output:
+```
+English: One Lakh Twenty Three Thousand Four Hundred Fifty Six Crore Seventy Eight Lakh Ninety Nine Thousand Eight Hundred Seventy Six Crore Fifty Four Lakh Thirty Two Thousand One Hundred Twelve Crore Thirty Four Lakh Fifty Six Thousand Seven Hundred Eighty Nine Crore Ninety Eight Lakh Seventy Six Thousand Five Hundred Forty Three Crore Twenty One Lakh Twelve Thousand Three Hundred Forty Five Crore Sixty Seven Lakh Eighty Nine Thousand Nine Hundred Eighty Seven Crore Sixty Five Lakh Forty Three Thousand Two Hundred Eleven Crore Twenty Three Lakh Forty Five Thousand Six Hundred Seventy Eight Crore Ninety Nine Lakh Eighty Seven Thousand Six Hundred Fifty Four Crore Thirty Two Lakh Eleven Thousand Two Hundred Thirty Four Crore Fifty Six Lakh Seventy Eight Thousand Nine Hundred Ninety Eight Crore Seventy Six Lakh Fifty Four Thousand Three Hundred Twenty One Crore Twelve Lakh Thirty Four Thousand Five Hundred Sixty Seven Crore Eighty Nine Lakh Ninety Eight Thousand Seven Hundred Sixty Five Crore Forty Three Lakh Twenty One Thousand One Hundred Twenty Three Crore Forty Five Lakh Sixty Seven Thousand Eight Hundred Ninety Nine Crore Eighty Seven Lakh Sixty Five Thousand Four Hundred Thirty Two Crore Eleven Lakh Twenty Three Thousand Four Hundred Fifty Six Crore Seventy Eight Lakh Ninety Nine Thousand Eight Hundred Seventy Six Crore Fifty Four Lakh Thirty Two Thousand One Hundred Twelve Crore Thirty Four Lakh Fifty Six Thousand Seven Hundred Eighty Nine Crore Ninety Eight Lakh Seventy Six Thousand Five Hundred Forty Three Crore Twenty One Lakh Twelve Thousand Three Hundred Forty Five Crore Sixty Seven Lakh Eighty Nine Thousand Nine Hundred Eighty Seven Crore Sixty Five Lakh Forty Three Thousand Two Hundred Eleven Crore Twenty Three Lakh Forty Five Thousand Six Hundred Seventy Eight Crore Ninety Nine Lakh Eighty Seven Thousand Six Hundred Fifty Four Crore Thirty Two Lakh Eleven Thousand Two Hundred Thirty Four Crore Fifty Six Lakh Seventy Eight Thousand Nine Hundred Ninety Eight Crore Seventy Six Lakh Fifty Four Thousand Three Hundred Twenty One
 ```
 
 ## License

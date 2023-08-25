@@ -4,6 +4,191 @@ import java.text.DecimalFormat;
 import java.util.stream.Collectors;
 
 public class NumberToBanglaWords {
+    public static void main(String[] args) {
+    }
+
+    public static String numberToBanglaText(Object numericValue, FORMAT format, NUMBER_DISPLAY numberDisplay) {
+        return processNumber(numericValue, format, numberDisplay);
+    }
+
+    public static String numberToBanglaText(Object numericValue, FORMAT format) {
+        return processNumber(numericValue, format, NUMBER_DISPLAY.DECIMAL);
+    }
+
+    public static String numberToBanglaText(Object numericValue) {
+        return processNumber(numericValue, FORMAT.ENGLISH, NUMBER_DISPLAY.DECIMAL);
+    }
+
+    private static String processNumber(Object numericValue, FORMAT format, NUMBER_DISPLAY numberDisplay) {
+        String result = "";
+        String number = String.valueOf(numericValue);
+
+        if (number.startsWith("-")) {
+            number = number.substring(1);
+            result = (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) ? "ঋণাত্মক " : "Minus ";
+        }
+
+        int dotIndex = number.indexOf('.');
+        String numberBeforeDecimal = (dotIndex != -1) ? number.substring(0, dotIndex) : number;
+        String decimalPartInWords = processDecimalNumberInWords(number, format, numberDisplay);
+
+        if (numberBeforeDecimal.equals("0") || numberBeforeDecimal.isEmpty()) {
+            result += (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) ? "শূন্য" : "Zero";
+            result += " " + decimalPartInWords;
+        } else {
+            if (format.equals(FORMAT.BANGLA)) {
+                result += traditionalBengaliFormat(numberBeforeDecimal);
+            } else if (format.equals(FORMAT.ENGLISH_LEGACY)) {
+                result += legacyBengaliFormatInEnglish(numberBeforeDecimal);
+            } else if (format.equals(FORMAT.BANGLA_LEGACY)) {
+                result += legacyBengaliFormat(numberBeforeDecimal);
+            } else {
+                result += traditionalBengaliFormatInEnglish(numberBeforeDecimal);
+            }
+            result += " " + decimalPartInWords;
+        }
+
+        return result.trim();
+    }
+
+    private static String traditionalBengaliFormatInEnglish(String inputString) {
+        int[] pattern = { 2, 2, 3 };
+        return convertNumberToWords(pattern, ENGLISH_NUMBER_UNITS, inputString);
+    }
+
+    private static String legacyBengaliFormatInEnglish(String inputString) {
+        int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
+        return convertNumberToWords(pattern, ENGLISH_LEGACY_NUMBER_UNITS, inputString);
+    }
+
+    private static String traditionalBengaliFormat(String inputString) {
+        int[] pattern = { 2, 2, 3 };
+        return convertNumberToWords(pattern, BENGALI_NUMBER_UNITS, inputString);
+    }
+
+    private static String legacyBengaliFormat(String inputString) {
+        int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
+        return convertNumberToWords(pattern, BENGALI_LEGACY_NUMBER_UNITS, inputString);
+    }
+
+    private static String decimalToTextBengali(String decimalPart) {
+        return decimalPart.chars().mapToObj(c -> BENGALI_ZERO_TO_HUNDRED[Character.getNumericValue(c)])
+                .collect(Collectors.joining(" "));
+    }
+
+    private static String decimalToTextEnglish(String decimalPart) {
+        return decimalPart.chars().mapToObj(c -> ONES[Character.getNumericValue(c)]).collect(Collectors.joining(" "));
+    }
+
+    private static String processDecimalNumberInWords(String number, FORMAT format, NUMBER_DISPLAY numberDisplay) {
+        int dotIndex = number.indexOf('.');
+
+        if (numberDisplay.equals(NUMBER_DISPLAY.DECIMAL)) {
+            if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
+                return (dotIndex == -1) ? ""
+                        : DOSHOMIK_BENGALI + " "
+                                + decimalToTextBengali(number.substring(dotIndex + 1).replaceAll("0*$", ""));
+            } else {
+                return (dotIndex == -1) ? ""
+                        : POINT + " " + decimalToTextEnglish(number.substring(dotIndex + 1).replaceAll("0*$", ""));
+
+            }
+        } else if (numberDisplay.equals(NUMBER_DISPLAY.CURRENCY)) {
+            String currencyUnit;
+            int roundedDecimalPart = makeRoundedDecimal(number);
+            if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
+                currencyUnit = (dotIndex == -1) ? TAKA_BENGALI
+                        : TAKA_BENGALI + " " + BENGALI_ZERO_TO_HUNDRED[roundedDecimalPart] + " " + PAISA_BENGALI;
+            } else {
+                currencyUnit = (dotIndex == -1) ? TAKA
+                        : TAKA + " " + convertLessThanThousand(roundedDecimalPart) + PAISA;
+            }
+            return currencyUnit;
+        } else {
+            return "";
+        }
+    }
+
+    private static int makeRoundedDecimal(String number) {
+        BigDecimal bigDecimal = new BigDecimal(number);
+        BigDecimal rounded = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+        DecimalFormat df = new DecimalFormat("#.00");
+        String formattedRounded = df.format(rounded);
+        int roundedDecimalPart = Integer.parseInt(formattedRounded.substring(formattedRounded.indexOf('.') + 1));
+        return roundedDecimalPart;
+    }
+
+    private static String convertLessThanThousandToWords(int num, String[] units) {
+        if (units == BENGALI_NUMBER_UNITS || units == BENGALI_LEGACY_NUMBER_UNITS) {
+            return convertLessThanThousandToBangla(num);
+        } else {
+            return convertLessThanThousand(num);
+        }
+    }
+
+    private static String convertLessThanThousandToBangla(int num) {
+        if (num == 0) {
+            return "";
+        } else if (num < 100) {
+            return BENGALI_ZERO_TO_HUNDRED[num] + " ";
+        } else {
+            return BENGALI_ZERO_TO_HUNDRED[num / 100] + " শত " + convertLessThanThousandToBangla(num % 100);
+        }
+    }
+
+    private static String convertLessThanThousand(int num) {
+        if (num == 0) {
+            return "";
+        } else if (num < 10) {
+            return ONES[num] + " ";
+        } else if (num < 20) {
+            return TEENS[num - 10] + " ";
+        } else if (num < 100) {
+            return TENS[num / 10] + " " + ONES[num % 10] + " ";
+        } else {
+            return ONES[num / 100] + " Hundred " + convertLessThanThousand(num % 100);
+        }
+    }
+
+    private static String convertNumberToWords(int[] pattern, String[] units, String inputString) {
+        String words = "";
+        int currentIndex = inputString.length();
+
+        boolean isUnitEnabled = false;
+        boolean shouldBreak = false;
+        while (currentIndex > 0) {
+            int index = 0;
+            for (int i = pattern.length - 1; i >= 0; i--) {
+                int length = pattern[i];
+                if (currentIndex > 0) {
+                    String substring = (currentIndex - length >= 0)
+                            ? inputString.substring(currentIndex - length, currentIndex)
+                            : inputString.substring(0, currentIndex);
+                    int number = Integer.parseInt(substring);
+
+                    if (isUnitEnabled && i == pattern.length - 1) {
+                        words = convertLessThanThousandToWords(number, units) + units[index] + units[pattern.length]
+                                + " " + words;
+                    } else {
+                        words = convertLessThanThousandToWords(number, units) + units[index] + " " + words;
+                    }
+
+                    currentIndex -= length;
+                    index++;
+                } else {
+                    shouldBreak = true;
+                    break;
+                }
+            }
+            if (shouldBreak) {
+                break;
+            }
+            isUnitEnabled = true;
+        }
+
+        return words.trim();
+    }
+
     private static enum FORMAT {
         BANGLA, BANGLA_LEGACY, ENGLISH, ENGLISH_LEGACY
     }
@@ -49,185 +234,4 @@ public class NumberToBanglaWords {
             "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
     private static final String[] BENGALI_LEGACY_NUMBER_UNITS = { "", "হাজার", "অযুত", "লক্ষ", "নিযুত", "কোটি",
             "অর্বুদ", "পদ্ম", "খর্ব", "নিখর্ব", "মহাপদ্ম", "শঙ্কু", "জলধি", "অন্ত্য", "মধ্য", "পরার্ধ" };
-
-    public static void main(String[] args) {
-    }
-
-    public static String numberToBanglaText(Object numericValue, FORMAT format, NUMBER_DISPLAY numberDisplay) {
-        return processNumber(numericValue, format, numberDisplay);
-    }
-
-    public static String numberToBanglaText(Object numericValue, FORMAT format) {
-        return processNumber(numericValue, format, NUMBER_DISPLAY.DECIMAL);
-    }
-
-    public static String numberToBanglaText(Object numericValue) {
-        return processNumber(numericValue, FORMAT.ENGLISH, NUMBER_DISPLAY.DECIMAL);
-    }
-
-    private static String processNumber(Object numericValue, FORMAT format, NUMBER_DISPLAY numberDisplay) {
-        String result = "";
-        String number = String.valueOf(numericValue);
-
-        if (number.startsWith("-")) {
-            number = number.substring(1);
-            result = "Minus ";
-        }
-
-        int dotIndex = number.indexOf('.');
-        String numberBeforeDecimal = (dotIndex != -1) ? number.substring(0, dotIndex) : number;
-        String decimalPartInWords = processDecimalNumberInWords(number, format, numberDisplay);
-
-        if (numberBeforeDecimal.equals("0") || numberBeforeDecimal.isEmpty()) {
-            result = (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) ? "শূন্য" : "Zero";
-            result += " " + decimalPartInWords;
-        } else {
-            if (format.equals(FORMAT.BANGLA)) {
-                result = traditionalBengaliFormat(numberBeforeDecimal);
-            } else if (format.equals(FORMAT.ENGLISH_LEGACY)) {
-                result = legacyBengaliFormatInEnglish(numberBeforeDecimal);
-            } else if (format.equals(FORMAT.BANGLA_LEGACY)) {
-                result = legacyBengaliFormat(numberBeforeDecimal);
-            } else {
-                result = traditionalBengaliFormatInEnglish(numberBeforeDecimal);
-            }
-            result += " " + decimalPartInWords;
-        }
-
-        return result.trim();
-    }
-
-    private static String processDecimalNumberInWords(String number, FORMAT format, NUMBER_DISPLAY numberDisplay) {
-        int dotIndex = number.indexOf('.');
-
-        if (numberDisplay.equals(NUMBER_DISPLAY.DECIMAL)) {
-            if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
-                return (dotIndex == -1) ? ""
-                        : DOSHOMIK_BENGALI + " "
-                                + decimalToTextBengali(number.substring(dotIndex + 1).replaceAll("0*$", ""));
-            } else {
-                return (dotIndex == -1) ? ""
-                        : POINT + " " + decimalToTextEnglish(number.substring(dotIndex + 1).replaceAll("0*$", ""));
-
-            }
-        } else if (numberDisplay.equals(NUMBER_DISPLAY.CURRENCY)) {
-            String currencyUnit;
-            int roundedDecimalPart = makeRoundedDecimal(number);
-            if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
-                currencyUnit = (dotIndex == -1) ? TAKA_BENGALI
-                        : TAKA_BENGALI + " " + BENGALI_ZERO_TO_HUNDRED[roundedDecimalPart] + " " + PAISA_BENGALI;
-            } else {
-                currencyUnit = (dotIndex == -1) ? TAKA
-                        : TAKA + " " + convertLessThanThousand(roundedDecimalPart) + PAISA;
-            }
-            return currencyUnit;
-        } else {
-            return "";
-        }
-    }
-
-    private static int makeRoundedDecimal(String number) {
-        BigDecimal bigDecimal = new BigDecimal(number);
-        BigDecimal rounded = bigDecimal.setScale(2, RoundingMode.HALF_UP);
-        DecimalFormat df = new DecimalFormat("#.00");
-        String formattedRounded = df.format(rounded);
-        int roundedDecimalPart = Integer.parseInt(formattedRounded.substring(formattedRounded.indexOf('.') + 1));
-        return roundedDecimalPart;
-    }
-
-    private static String decimalToTextBengali(String decimalPart) {
-        return decimalPart.chars().mapToObj(c -> BENGALI_ZERO_TO_HUNDRED[Character.getNumericValue(c)])
-                .collect(Collectors.joining(" "));
-    }
-
-    private static String decimalToTextEnglish(String decimalPart) {
-        return decimalPart.chars().mapToObj(c -> ONES[Character.getNumericValue(c)]).collect(Collectors.joining(" "));
-    }
-
-    private static String convertLessThanThousandToWords(int num, String[] units) {
-        if (units == BENGALI_NUMBER_UNITS || units == BENGALI_LEGACY_NUMBER_UNITS) {
-            return convertLessThanThousandToBangla(num);
-        } else {
-            return convertLessThanThousand(num);
-        }
-    }
-
-    private static String convertLessThanThousandToBangla(int num) {
-        if (num == 0) {
-            return "";
-        } else if (num < 100) {
-            return BENGALI_ZERO_TO_HUNDRED[num] + " ";
-        } else {
-            return BENGALI_ZERO_TO_HUNDRED[num / 100] + " শত " + convertLessThanThousandToBangla(num % 100);
-        }
-    }
-
-    private static String convertLessThanThousand(int num) {
-        if (num == 0) {
-            return "";
-        } else if (num < 10) {
-            return ONES[num] + " ";
-        } else if (num < 20) {
-            return TEENS[num - 10] + " ";
-        } else if (num < 100) {
-            return TENS[num / 10] + " " + ONES[num % 10] + " ";
-        } else {
-            return ONES[num / 100] + " Hundred " + convertLessThanThousand(num % 100);
-        }
-    }
-
-    private static String convertNumberToWords(int[] pattern, String[] units, String inputString) {
-        String words = "";
-        int currentIndex = inputString.length();
-        boolean isUnitEnabled = false;
-        boolean shouldBreak = false;
-        while (currentIndex > 0) {
-            int index = 0;
-            for (int i = pattern.length - 1; i >= 0; i--) {
-                int length = pattern[i];
-                if (currentIndex - length >= 0) {
-                    String substring = inputString.substring(currentIndex - length, currentIndex);
-                    int number = Integer.parseInt(substring);
-
-                    if (isUnitEnabled && i == pattern.length - 1) {
-                        words = convertLessThanThousandToWords(number, units) + units[index] + units[pattern.length]
-                                + " " + words;
-                    } else {
-                        words = convertLessThanThousandToWords(number, units) + units[index] + " " + words;
-                    }
-
-                    currentIndex -= length;
-                    index++;
-                } else {
-                    shouldBreak = true;
-                    break;
-                }
-            }
-            if (shouldBreak) {
-                break;
-            }
-            isUnitEnabled = true;
-        }
-        return words.trim();
-    }
-
-    private static String traditionalBengaliFormatInEnglish(String inputString) {
-        int[] pattern = { 2, 2, 3 };
-        return convertNumberToWords(pattern, ENGLISH_NUMBER_UNITS, inputString);
-    }
-
-    private static String legacyBengaliFormatInEnglish(String inputString) {
-        int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
-        return convertNumberToWords(pattern, ENGLISH_LEGACY_NUMBER_UNITS, inputString);
-    }
-
-    private static String traditionalBengaliFormat(String inputString) {
-        int[] pattern = { 2, 2, 3 };
-        return convertNumberToWords(pattern, BENGALI_NUMBER_UNITS, inputString);
-    }
-
-    private static String legacyBengaliFormat(String inputString) {
-        int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
-        return convertNumberToWords(pattern, BENGALI_LEGACY_NUMBER_UNITS, inputString);
-    }
 }
