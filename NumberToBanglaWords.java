@@ -15,6 +15,10 @@ public class NumberToBanglaWords {
         return processNumber(numericValue, format, NUMBER_DISPLAY.DECIMAL);
     }
 
+    public static String numberToBanglaText(Object numericValue, NUMBER_DISPLAY numberDisplay) {
+        return processNumber(numericValue, FORMAT.ENGLISH, numberDisplay);
+    }
+
     public static String numberToBanglaText(Object numericValue) {
         return processNumber(numericValue, FORMAT.ENGLISH, NUMBER_DISPLAY.DECIMAL);
     }
