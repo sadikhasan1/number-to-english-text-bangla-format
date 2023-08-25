@@ -1,76 +1,114 @@
-# Number to Words Converter (English and Bangla)
+# NumberToBanglaWords
 
-## Overview
-
-This Java utility provides a flexible and efficient solution for converting numerical values into their corresponding word representations, supporting both English and Bangla languages. The code employs modular and well-organized methods, enabling seamless handling of different numeric inputs and language preferences. The utility also offers various formats for presenting the converted words.
-
-## Features
-
-- Conversion of numeric values into words in English and Bangla languages.
-- Support for traditional and legacy Bengali numeric formats.
-- Flexibility to choose between English and Bangla language outputs.
-- Modular design for easy integration into other projects.
-- Supports pretty much any number. Sky is the limit.
+`NumberToBanglaWords` is a Java class that provides methods to convert numeric values into their equivalent textual representation in Bengali and English languages. It supports both traditional and legacy formats for representing numbers.
 
 ## Usage
 
-To use this utility, follow these steps:
+You can use the provided methods to convert numeric values into text. The class offers the following conversion options:
 
-1. Clone or download the project repository.
-2. Open your Java development environment.
-3. Import the `NumberToBanglaWords.java` class into your project.
+1. Convert a numeric value to its Bengali or English representation in decimal form.
+2. Convert a numeric value to its Bengali or English representation in currency format (Taka and Paisa).
 
-## API Reference
+### Import
 
-### `numberToBanglaText(Object numericValue, FORMAT format)`
+```java
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.stream.Collectors;
+```
 
-Converts a numeric value into its word representation based on the specified format.
+### Convert Numeric Values
 
-- `numericValue`: The numeric value to convert.
-- `format`: The desired format (`FORMAT.BANGLA`, `FORMAT.BANGLA_LEGACY`, `FORMAT.ENGLISH`, `FORMAT.ENGLISH_LEGACY`).
+```java
+// Convert a numeric value to its Bengali representation in decimal form
+String bengaliDecimalText = NumberToBanglaWords.numberToBanglaText(numericValue, NumberToBanglaWords.FORMAT.BANGLA);
 
-### `numberToBanglaText(Object numericValue)`
-
-Converts a numeric value into its word representation in traditional Bengali format (English language).
+// Convert a numeric value to its English representation in currency format
+String englishCurrencyText = NumberToBanglaWords.numberToBanglaText(numericValue, NumberToBanglaWords.FORMAT.ENGLISH, NumberToBanglaWords.NUMBER_DISPLAY.CURRENCY);
+```
 
 ## Supported Formats
 
-- `FORMAT.BANGLA`: Converts to modern Bengali numeric format.
-- `FORMAT.BANGLA_LEGACY`: Converts to legacy Bengali numeric format.
-- `FORMAT.ENGLISH`: Converts to English numeric format.
-- `FORMAT.ENGLISH_LEGACY`: Converts to legacy English numeric format.
+The class supports the following formats:
 
-## Examples
+- `FORMAT.BANGLA`: Traditional Bengali numeric representation.
+- `FORMAT.BANGLA_LEGACY`: Legacy Bengali numeric representation.
+- `FORMAT.ENGLISH`: Traditional English numeric representation.
+- `FORMAT.ENGLISH_LEGACY`: Legacy English numeric representation.
+
+## Supported Number Displays
+
+The class supports the following number displays:
+
+- `NUMBER_DISPLAY.DECIMAL`: Decimal representation.
+- `NUMBER_DISPLAY.CURRENCY`: Currency representation.
+
+## Notes
+
+- The class uses various arrays to map numeric values to their textual representations in both Bengali and English.
+- Conversion to currency format includes Taka and Paisa.
+
+## Example
+
+
+### Example 1: Converting to Bengali Decimal Text
 
 ```java
-int input = "123456789";
+public class Main {
+    public static void main(String[] args) {
+        double numericValue = 12345.67;
 
-String englishWords = NumberToBanglaWords.numberToBanglaText(input);
-System.out.println("English: " + englishWords);
+        String bengaliDecimalText = NumberToBanglaWords.numberToBanglaText(numericValue, NumberToBanglaWords.FORMAT.BANGLA);
 
-String bengaliWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.BANGLA);
-System.out.println("Bengali: " + bengaliWords);
+        System.out.println("Bengali Decimal Text: " + bengaliDecimalText);
+    }
+}
 ```
 
-## Let's get crazy. This code can handle pretty much any number. Let's try it out!
+Output:
+```
+Bengali Decimal Text: বারো হাজার তিনশত পঁয়তাল্লিশ দশমিক সাতোষ্ঠি
+```
+
+### Example 2: Converting to English Currency Text
 
 ```java
-String input = "123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321123456789987654321";
-String englishWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.ENGLISH);
-System.out.println("English: " + englishWords);
+public class Main {
+    public static void main(String[] args) {
+        double numericValue = 12345.67;
 
-String bengaliWords = NumberToBanglaWords.numberToBanglaText(input, FORMAT.BANGLA_LEGACY);
-System.out.println("Bengali: " + bengaliWords);
+        String englishCurrencyText = NumberToBanglaWords.numberToBanglaText(numericValue, NumberToBanglaWords.FORMAT.ENGLISH, NumberToBanglaWords.NUMBER_DISPLAY.CURRENCY);
+
+        System.out.println("English Currency Text: " + englishCurrencyText);
+    }
+}
 ```
 
-## Contribution
+Output:
+```
+English Currency Text: Twelve Thousand Three Hundred Forty-Five Taka Sixty-Seven Paisa
+```
 
-Contributions, bug reports, and suggestions are welcome. Feel free to submit issues or pull requests on GitHub.
+### Example 3: Converting with Default Format and Display
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        double numericValue = 98765.43;
+
+        String defaultText = NumberToBanglaWords.numberToBanglaText(numericValue);
+
+        System.out.println("Default Text: " + defaultText);
+    }
+}
+```
+
+Output:
+```
+Default Text: নয়সয় হাজার সাতশত পঁয়ত্রিশ দশমিক চুরানব্বই
+```
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-*Refer to the inline comments in the code for more detailed explanations and insights.*
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

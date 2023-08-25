@@ -1,9 +1,25 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.stream.Collectors;
+
 public class NumberToBanglaWords {
     private static enum FORMAT {
         BANGLA, BANGLA_LEGACY, ENGLISH, ENGLISH_LEGACY
     }
 
-    private static final String[] ONES = { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+    private static enum NUMBER_DISPLAY {
+        DECIMAL, CURRENCY
+    }
+
+    private static String DOSHOMIK_BENGALI = "দশমিক";
+    private static String TAKA_BENGALI = "টাকা";
+    private static String PAISA_BENGALI = "পয়সা";
+    private static String POINT = "Point";
+    private static String TAKA = "Taka";
+    private static String PAISA = "Paisa";
+
+    private static final String[] ONES = { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
             "Nine" };
 
     private static final String[] TEENS = { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
@@ -37,20 +53,95 @@ public class NumberToBanglaWords {
     public static void main(String[] args) {
     }
 
+    public static String numberToBanglaText(Object numericValue, FORMAT format, NUMBER_DISPLAY numberDisplay) {
+        return processNumber(numericValue, format, numberDisplay);
+    }
+
     public static String numberToBanglaText(Object numericValue, FORMAT format) {
-        if (format.equals(FORMAT.BANGLA)) {
-            return traditionalBengaliFormat(String.valueOf(numericValue));
-        } else if (format.equals(FORMAT.BANGLA_LEGACY)) {
-            return legacyBengaliFormat(String.valueOf(numericValue));
-        } else if (format.equals(FORMAT.ENGLISH_LEGACY)) {
-            return legacyBengaliFormatInEnglish(String.valueOf(numericValue));
-        } else {
-            return traditionalBengaliFormatInEnglish(String.valueOf(numericValue));
-        }
+        return processNumber(numericValue, format, NUMBER_DISPLAY.DECIMAL);
     }
 
     public static String numberToBanglaText(Object numericValue) {
-        return traditionalBengaliFormatInEnglish(String.valueOf(numericValue));
+        return processNumber(numericValue, FORMAT.ENGLISH, NUMBER_DISPLAY.DECIMAL);
+    }
+
+    private static String processNumber(Object numericValue, FORMAT format, NUMBER_DISPLAY numberDisplay) {
+        String result = "";
+        String number = String.valueOf(numericValue);
+
+        if (number.startsWith("-")) {
+            number = number.substring(1);
+            result = "Minus ";
+        }
+
+        int dotIndex = number.indexOf('.');
+        String numberBeforeDecimal = (dotIndex != -1) ? number.substring(0, dotIndex) : number;
+        String decimalPartInWords = processDecimalNumberInWords(number, format, numberDisplay);
+
+        if (numberBeforeDecimal.equals("0") || numberBeforeDecimal.isEmpty()) {
+            result = (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) ? "শূন্য" : "Zero";
+            result += " " + decimalPartInWords;
+        } else {
+            if (format.equals(FORMAT.BANGLA)) {
+                result = traditionalBengaliFormat(numberBeforeDecimal);
+            } else if (format.equals(FORMAT.ENGLISH_LEGACY)) {
+                result = legacyBengaliFormatInEnglish(numberBeforeDecimal);
+            } else if (format.equals(FORMAT.BANGLA_LEGACY)) {
+                result = legacyBengaliFormat(numberBeforeDecimal);
+            } else {
+                result = traditionalBengaliFormatInEnglish(numberBeforeDecimal);
+            }
+            result += " " + decimalPartInWords;
+        }
+
+        return result.trim();
+    }
+
+    private static String processDecimalNumberInWords(String number, FORMAT format, NUMBER_DISPLAY numberDisplay) {
+        int dotIndex = number.indexOf('.');
+
+        if (numberDisplay.equals(NUMBER_DISPLAY.DECIMAL)) {
+            if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
+                return (dotIndex == -1) ? ""
+                        : DOSHOMIK_BENGALI + " "
+                                + decimalToTextBengali(number.substring(dotIndex + 1).replaceAll("0*$", ""));
+            } else {
+                return (dotIndex == -1) ? ""
+                        : POINT + " " + decimalToTextEnglish(number.substring(dotIndex + 1).replaceAll("0*$", ""));
+
+            }
+        } else if (numberDisplay.equals(NUMBER_DISPLAY.CURRENCY)) {
+            String currencyUnit;
+            int roundedDecimalPart = makeRoundedDecimal(number);
+            if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
+                currencyUnit = (dotIndex == -1) ? TAKA_BENGALI
+                        : TAKA_BENGALI + " " + BENGALI_ZERO_TO_HUNDRED[roundedDecimalPart] + " " + PAISA_BENGALI;
+            } else {
+                currencyUnit = (dotIndex == -1) ? TAKA
+                        : TAKA + " " + convertLessThanThousand(roundedDecimalPart) + PAISA;
+            }
+            return currencyUnit;
+        } else {
+            return "";
+        }
+    }
+
+    private static int makeRoundedDecimal(String number) {
+        BigDecimal bigDecimal = new BigDecimal(number);
+        BigDecimal rounded = bigDecimal.setScale(2, RoundingMode.HALF_UP);
+        DecimalFormat df = new DecimalFormat("#.00");
+        String formattedRounded = df.format(rounded);
+        int roundedDecimalPart = Integer.parseInt(formattedRounded.substring(formattedRounded.indexOf('.') + 1));
+        return roundedDecimalPart;
+    }
+
+    private static String decimalToTextBengali(String decimalPart) {
+        return decimalPart.chars().mapToObj(c -> BENGALI_ZERO_TO_HUNDRED[Character.getNumericValue(c)])
+                .collect(Collectors.joining(" "));
+    }
+
+    private static String decimalToTextEnglish(String decimalPart) {
+        return decimalPart.chars().mapToObj(c -> ONES[Character.getNumericValue(c)]).collect(Collectors.joining(" "));
     }
 
     private static String convertLessThanThousandToWords(int num, String[] units) {
@@ -85,10 +176,6 @@ public class NumberToBanglaWords {
         }
     }
 
-    public static String convertToString(Object numericValue) {
-        return String.valueOf(numericValue);
-    }
-
     private static String convertNumberToWords(int[] pattern, String[] units, String inputString) {
         String words = "";
         int currentIndex = inputString.length();
@@ -121,7 +208,7 @@ public class NumberToBanglaWords {
             }
             isUnitEnabled = true;
         }
-        return words;
+        return words.trim();
     }
 
     private static String traditionalBengaliFormatInEnglish(String inputString) {
@@ -143,5 +230,4 @@ public class NumberToBanglaWords {
         int[] pattern = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
         return convertNumberToWords(pattern, BENGALI_LEGACY_NUMBER_UNITS, inputString);
     }
-
 }
