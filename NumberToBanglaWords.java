@@ -101,10 +101,10 @@ public class NumberToBanglaWords {
             String currencyUnit;
             int roundedDecimalPart = makeRoundedDecimal(number);
             if (format.equals(FORMAT.BANGLA) || format.equals(FORMAT.BANGLA_LEGACY)) {
-                currencyUnit = (dotIndex == -1) ? TAKA_BENGALI
+                currencyUnit = (dotIndex == -1) || roundedDecimalPart == 0 ? TAKA_BENGALI
                         : TAKA_BENGALI + " " + BENGALI_ZERO_TO_HUNDRED[roundedDecimalPart] + " " + PAISA_BENGALI;
             } else {
-                currencyUnit = (dotIndex == -1) ? TAKA
+                currencyUnit = (dotIndex == -1) || roundedDecimalPart == 0 ? TAKA
                         : TAKA + " " + convertLessThanThousand(roundedDecimalPart) + PAISA;
             }
             return currencyUnit;
